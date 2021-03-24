@@ -1,8 +1,7 @@
 part of '../../HDM.dart';
 
-//todo check becouseit is a function that the app won't cash it
 // ignore: must_be_immutable
-class HDMBuilder extends StatefulWidget {
+class HDM extends StatefulWidget {
   ///you need this format
   ///
   /// CLASS.KEY.BUILD ((BOX)=>CONTAINER())
@@ -10,35 +9,31 @@ class HDMBuilder extends StatefulWidget {
 
   final _StorageHolder keyBuilder;
   final HDMMix app;
-  HDMBuilder({@required this.keyBuilder, this.app}) : super(key: UniqueKey()) {
+  HDM({@required this.keyBuilder, this.app}) : super(key: UniqueKey()) {
     //print("HDMBuilder constructor ");
   }
   bool _didNotInitialized = true;
 
   @override
-  _HDMBuilderState createState() => _HDMBuilderState();
+  _HDMState createState() => _HDMState();
 }
 
-class _HDMBuilderState extends State<HDMBuilder> {
+class _HDMState extends State<HDM> {
   //region init and dispose  and firstTimeCHeck
-  void initState() {
-    //print("a7aaaaaa");
-    super.initState();
-  }
 
   @override
   void didChangeDependencies() {
     // print("didChangeDependencies");
     widget.keyBuilder.box.context = context;
     _checkIfItIsTheFirstTime();
-    widget.keyBuilder.box.app.data.addSetStateFunToTable(widget.keyBuilder.key, setState);
+    widget.keyBuilder.box.app.data._addSetStateFunctionToTable(widget.keyBuilder.key, setState);
 
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    widget.keyBuilder.box.app.data.removeSetStateFunToTable(widget.keyBuilder.key, setState);
+    widget.keyBuilder.box.app.data._removeSetStateFunctionToTable(widget.keyBuilder.key, setState);
     super.dispose();
   }
 
@@ -60,10 +55,8 @@ class _HDMBuilderState extends State<HDMBuilder> {
   }
 
   //endregion
-  //todo add cashing for children
-
   Widget build(BuildContext context) {
-    assert(widget.keyBuilder.box.app != null, "app = null");
+    assert(widget.keyBuilder.box.app != null, "app == null");
     return widget.keyBuilder.build(context);
   }
 }

@@ -1,8 +1,6 @@
 //region imports
 
-import 'package:extension/enum.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 part 'Helpers/Builder/Box.dart';
 part 'Helpers/Builder/Moduel.dart';
@@ -16,7 +14,7 @@ part 'Helpers/Provider/moduel.dart';
 
 //endregion
 
-class HDM<Handler extends HDMMix<Handler>> {
+class HDMMain<Handler extends HDMMix<Handler>> {
   //region  The Constructor
   final Handler _handler;
   final Widget Function(HDMBox<Handler>) _statsHere;
@@ -24,9 +22,9 @@ class HDM<Handler extends HDMMix<Handler>> {
   final List<HDMKey<Handler>> _keysList;
   Widget Function(HDMBox<Handler>) _initial;
   //region  Constructor fun
-  HDM(this._handler, this._statsHere, this._keysList, [this._wait, Widget initial2]) {
+  HDMMain(this._handler, this._statsHere, this._keysList, [this._wait, Widget initial2]) {
     initial2 == null ? _initial = (box) => _StatsInitial() : _initial = _initial;
-    assignTable();
+    _assignTable();
   }
 
   //endregion
@@ -34,20 +32,27 @@ class HDM<Handler extends HDMMix<Handler>> {
   //endregion
 
   //region  Functions TableHandling
-  final HDMKey<Handler> _fullAppKey = HDMKey<Handler>(0);
+  final HDMKey<Handler> _fullAppKey = HDMKey<Handler>();
   final Map<HDMKey<Handler>, _HDMKeyController<Handler>> _tableOfSetStateFuncList = {};
 
   ///Creat and Object for eachKey That the class have
-  void assignTable() {
-    assert(_keysList.isNotEmpty, "No keys");
+  void _assignTable() {
+    assert(_keysList.isNotEmpty, "No keys , witout key");
     _keysList.forEach((enumElement) {
       _tableOfSetStateFuncList.addAll({enumElement: _HDMKeyController<Handler>()});
     });
     _tableOfSetStateFuncList.addAll({_fullAppKey: _HDMKeyController<Handler>()});
   }
 
-  void addSetStateFunToTable(HDMKey<Handler> x, Function y) => _tableOfSetStateFuncList[x].addSetStateFunToTable(y);
-  void removeSetStateFunToTable(HDMKey<Handler> x, Function y) => _tableOfSetStateFuncList[x].removeSetStateFunToTable(y);
+  void _addSetStateFunctionToTable(HDMKey<Handler> hdmKey, Function setStateFunctionPointer) {
+    assert(_tableOfSetStateFuncList.containsKey(hdmKey), "this key dons't excist , you probably didin't add it to the list _keyList in  $Handler");
+    _tableOfSetStateFuncList[hdmKey].addSetStateFunToTable(setStateFunctionPointer);
+  }
+
+  void _removeSetStateFunctionToTable(HDMKey<Handler> hdmKey, Function setStateFunctionPointer) {
+    _tableOfSetStateFuncList[hdmKey].removeSetStateFunToTable(setStateFunctionPointer);
+  }
+
   //endregion
   //region    Handler Api
   bool _didNotInitialized = true;
@@ -67,7 +72,7 @@ class HDM<Handler extends HDMMix<Handler>> {
         //print("Wait");
         waitForIT();
 
-        return HDMBuilder(
+        return HDM(
             app: _handler,
             keyBuilder: _fullAppKey.keyBuild((box) {
               if (_didNotInitialized) {
@@ -81,16 +86,18 @@ class HDM<Handler extends HDMMix<Handler>> {
       }
       _didNotInitialized = false;
     }
-    return HDMBuilder(app: _handler, keyBuilder: _fullAppKey.keyBuild((box) => _statsHere(box)));
+    return HDM(app: _handler, keyBuilder: _fullAppKey.keyBuild((box) => _statsHere(box)));
   }
 
   Widget playWIthProvider() {
     return HDMProvider(play(), [HDMProvide<Handler>(_handler)]);
   }
 
-  void update([HDMKey<Handler> E]) {
-    if (E != null) {
-      _tableOfSetStateFuncList[E].triggerAllSetStateFunctions();
+  void update([HDMKey<Handler> hdmKey]) {
+    if (hdmKey != null) {
+      assert(_tableOfSetStateFuncList.containsKey(hdmKey), "this key dons't excist , you probably didin't add it to the list _keyList in  $Handler");
+
+      _tableOfSetStateFuncList[hdmKey].triggerAllSetStateFunctions();
     } else {
       //print("_fullAppKey");
       _tableOfSetStateFuncList[_fullAppKey].triggerAllSetStateFunctions();

@@ -1,7 +1,5 @@
 part of '../../HDM.dart';
 
-//todo make it privite
-
 class HDMBox<Handler> {
   BuildContext context;
   Handler app;
