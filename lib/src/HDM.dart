@@ -1,98 +1,101 @@
+//region imports
+
+import 'package:extension/enum.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-part 'Helpers/WidgetStats.dart';
-part 'Helpers/bloc.dart';
+part 'Helpers/Builder/Box.dart';
+part 'Helpers/Builder/Moduel.dart';
+part 'Helpers/Key/Key.dart';
+part 'Helpers/Key/Storage.dart';
+part 'Helpers/Key/keyControler.dart';
+part 'Helpers/Other/WidgetStats.dart';
+part 'Helpers/Other/mixin.dart';
+part 'Helpers/Provider/Providerlib.dart';
+part 'Helpers/Provider/moduel.dart';
 
-class HDM<Handler> {
-  // ignore: unused_field
-  List<int> _whatToBuild = [];
-  bool stateReady = false;
-  @required
+//endregion
+
+class HDM<Handler extends HDMMix<Handler>> {
+  //region  The Constructor
   final Handler _handler;
-  @required
-  final Function _statsHere;
-
-  Function _wait;
-  Widget _initial;
-
-  HDM(this._handler, this._statsHere, {Function wait, Widget initial}) {
-    wait == null ? _wait = () => null : _wait = wait;
-    initial == null ? _initial = _StatsInitial() : _initial = initial;
-
-    _start();
+  final Widget Function(HDMBox<Handler>) _statsHere;
+  final Function _wait;
+  final List<HDMKey<Handler>> _keysList;
+  Widget Function(HDMBox<Handler>) _initial;
+  //region  Constructor fun
+  HDM(this._handler, this._statsHere, this._keysList, [this._wait, Widget initial2]) {
+    initial2 == null ? _initial = (box) => _StatsInitial() : _initial = _initial;
+    assignTable();
   }
 
-  BlocMain<Handler> _bloc;
+  //endregion
 
-  bool seeWhatToBuild(int x) {
-    //called from the UI to check if to build
-    ///if any is false ? r=flase:r=true
-    if (_whatToBuild.contains(x)) {
-      return true;
-    }
+  //endregion
 
-    return false;
+  //region  Functions TableHandling
+  final HDMKey<Handler> _fullAppKey = HDMKey<Handler>(0);
+  final Map<HDMKey<Handler>, _HDMKeyController<Handler>> _tableOfSetStateFuncList = {};
+
+  ///Creat and Object for eachKey That the class have
+  void assignTable() {
+    assert(_keysList.isNotEmpty, "No keys");
+    _keysList.forEach((enumElement) {
+      _tableOfSetStateFuncList.addAll({enumElement: _HDMKeyController<Handler>()});
+    });
+    _tableOfSetStateFuncList.addAll({_fullAppKey: _HDMKeyController<Handler>()});
   }
 
-  Future<void> _start() async {
-    //zero
-
-    /// if there is no data to get , it will start right away
-    await _wait();
-    _bloc?.add(0);
-
-    stateReady = true;
-  }
-
-  BlocMain<Handler> _getBloc() {
-    ///Creat a new Block for the new build
-    _bloc = BlocMain<Handler>(_handler);
-    // ignore: unnecessary_statements
-    stateReady == true ? update([0]) : null;
-    return _bloc;
-  }
-
-  final UniqueKey _key = UniqueKey();
+  void addSetStateFunToTable(HDMKey<Handler> x, Function y) => _tableOfSetStateFuncList[x].addSetStateFunToTable(y);
+  void removeSetStateFunToTable(HDMKey<Handler> x, Function y) => _tableOfSetStateFuncList[x].removeSetStateFunToTable(y);
+  //endregion
+  //region    Handler Api
+  bool _didNotInitialized = true;
 
   Widget play() {
-    Widget statsBlockStateFunctions({final StateMain state}) {
-      // print("case start ${state.index}");
-      if ((state.index == 0) | (stateReady == true) | (state.index == 10)) {
-        // print("case update ");
-        return _statsHere(state);
-      } else if (state.index == 2) {
-        return _StatsNoConnection();
-      } else if (state.index == 1) {
-        stateReady = true;
-        return _initial;
-      } else {
-        return _StatsErrBlock();
+    Future<void> waitForIT() async {
+      await _wait();
+      _didNotInitialized = false;
+
+      update();
+    }
+
+    if (_didNotInitialized) {
+      // print("HDM _didNotInitialized");
+
+      if (_wait != null) {
+        //print("Wait");
+        waitForIT();
+
+        return HDMBuilder(
+            app: _handler,
+            keyBuilder: _fullAppKey.keyBuild((box) {
+              if (_didNotInitialized) {
+                //print("case 1");
+                return _initial(box);
+              } else {
+                //print("case 3");
+                return _statsHere(box);
+              }
+            }));
       }
+      _didNotInitialized = false;
     }
-
-    return BlocProvider(
-      key: _key,
-      create: (_) => _getBloc(),
-      child: Builder(
-        builder: (context) => BlocBuilder<BlocMain<Handler>, StateMain<Handler>>(
-          buildWhen: (previous, current) {
-            return seeWhatToBuild(1);
-          },
-          builder: (context, state) => statsBlockStateFunctions(state: state),
-        ),
-      ),
-    );
+    return HDMBuilder(app: _handler, keyBuilder: _fullAppKey.keyBuild((box) => _statsHere(box)));
   }
 
-  ///0=> the whole page
-  void update(List<int> value) {
-    if (_bloc == null) {
-      print("A build With No bolc on${this.runtimeType}");
-    }
-    _whatToBuild = value;
-
-    _bloc.add(0);
+  Widget playWIthProvider() {
+    return HDMProvider(play(), [HDMProvide<Handler>(_handler)]);
   }
+
+  void update([HDMKey<Handler> E]) {
+    if (E != null) {
+      _tableOfSetStateFuncList[E].triggerAllSetStateFunctions();
+    } else {
+      //print("_fullAppKey");
+      _tableOfSetStateFuncList[_fullAppKey].triggerAllSetStateFunctions();
+    }
+  }
+
+  //endregion
 }
