@@ -6,7 +6,7 @@ class _StorageHolder<Handler> {
   final HDMBox<Handler> box;
   const _StorageHolder(this.key, this.widgetBuilder, this.box);
   void getStorageBoxFromBuilder() {}
-  void getAppWithProvider() => box._getAppWithProvider(box.context.dependOnInheritedWidgetOfExactType<_HDMProviderObj<Handler>>());
+  void getAppWithProvider() => box._getAppWithProvider(box.context.dependOnInheritedWidgetOfExactType<_HDMProviderObj<Handler>>()!);
 
   void getAppWithNoProvider(HDMMain hdmMainObj) => box._getAppWithNoProvider(hdmMainObj);
 

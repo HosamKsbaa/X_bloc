@@ -9,15 +9,15 @@ class HDM extends StatefulWidget {
   // final UniqueKey x=UniqueKey();
 
   final _StorageHolder child;
-  final HDMMain app;
-  const HDM({@required this.child, this.app});
+  final HDMMain? app;
+  const HDM({required this.child, this.app});
   @override
   _HDMState createState() => _HDMState(this.app, this.child);
 }
 
 class _HDMState extends State<HDM> {
   final _StorageHolder child;
-  final HDMMain app;
+  final HDMMain? app;
   _HDMState(this.app, this.child);
   //region init and dispose  and firstTimeCHeck
 
@@ -48,7 +48,7 @@ class _HDMState extends State<HDM> {
     } else {
       //dp it normaly
 
-      child.getAppWithNoProvider(widget.app);
+      child.getAppWithNoProvider(widget.app!);
     }
   }
 

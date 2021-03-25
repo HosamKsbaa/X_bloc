@@ -17,11 +17,11 @@ class HDMMain<Handler> {
   //region  The Constructor
   final Handler _handler;
   final Widget Function(HDMBox<Handler>) _statsHere;
-  final Function _wait;
+  final Function? _wait;
   final List<HDMKey<Handler>> _keysList;
-  Widget Function(HDMBox<Handler>) _initial;
+  Widget Function(HDMBox<Handler>)? _initial;
   //region  Constructor fun
-  HDMMain(this._handler, this._statsHere, this._keysList, [this._wait, Widget initial2]) {
+  HDMMain(this._handler, this._statsHere, this._keysList, [this._wait, Widget? initial2]) {
     initial2 == null ? _initial = (box) => const _StatsInitial() : _initial = _initial;
     _assignTable();
   }
@@ -45,11 +45,11 @@ class HDMMain<Handler> {
 
   void _addSetStateFunctionToTable(HDMKey<Handler> hdmKey, Function setStateFunctionPointer) {
     assert(_tableOfSetStateFuncList.containsKey(hdmKey), "this key dons't excist , you probably didin't add it to the list _keyList in  $Handler");
-    _tableOfSetStateFuncList[hdmKey].addSetStateFunToTable(setStateFunctionPointer);
+    _tableOfSetStateFuncList[hdmKey]!.addSetStateFunToTable(setStateFunctionPointer);
   }
 
   void _removeSetStateFunctionToTable(HDMKey<Handler> hdmKey, Function setStateFunctionPointer) {
-    _tableOfSetStateFuncList[hdmKey].removeSetStateFunToTable(setStateFunctionPointer);
+    _tableOfSetStateFuncList[hdmKey]!.removeSetStateFunToTable(setStateFunctionPointer);
   }
 
   //endregion
@@ -58,7 +58,7 @@ class HDMMain<Handler> {
 
   Widget play() {
     Future<void> waitForIT() async {
-      await _wait();
+      await _wait!();
       _didNotInitialized = false;
 
       updateTheWholeApp();
@@ -76,7 +76,7 @@ class HDMMain<Handler> {
             child: _fullAppKey.keyBuild((box) {
               if (_didNotInitialized) {
                 //print("case 1");
-                return _initial(box);
+                return _initial!(box);
               } else {
                 //print("case 3");
                 return _statsHere(box);
@@ -95,11 +95,11 @@ class HDMMain<Handler> {
   void update(HDMKey<Handler> hdmKey) {
     // assert(_tableOfSetStateFuncList.containsKey(hdmKey), "this key dons't excist , you probably didin't add it to the list _keyList in  $Handler");
 
-    _tableOfSetStateFuncList[hdmKey].triggerAllSetStateFunctions();
+    _tableOfSetStateFuncList[hdmKey]!.triggerAllSetStateFunctions();
   }
 
   void updateTheWholeApp() {
-    _tableOfSetStateFuncList[_fullAppKey].triggerAllSetStateFunctions();
+    _tableOfSetStateFuncList[_fullAppKey]!.triggerAllSetStateFunctions();
   }
   //endregion
 }

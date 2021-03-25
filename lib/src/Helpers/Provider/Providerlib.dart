@@ -3,9 +3,9 @@ part of '../../HDM.dart';
 // ignore: must_be_immutable
 
 class _HDMProviderObj<Handler> extends InheritedWidget {
-  final Handler state;
-  final HDMMain<Handler> hdmMainObj;
-  const _HDMProviderObj({this.state, Widget child, this.hdmMainObj}) : super(child: child);
+  final Handler? state;
+  final HDMMain<Handler>? hdmMainObj;
+  const _HDMProviderObj({this.state, required Widget child, this.hdmMainObj}) : super(child: child);
   @override
   bool updateShouldNotify(covariant InheritedWidget oldWidget) => false;
   //static  HDMProviderObj of(BuildContext context)=>context.inheritFromWidgetOfExactType()   ;
@@ -38,7 +38,7 @@ class HDMProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(providers != null, "You didn't give any providers here");
+    //assert(providers != null, "You didn't give any providers here");
 
     return _composer(passedChild);
   }
