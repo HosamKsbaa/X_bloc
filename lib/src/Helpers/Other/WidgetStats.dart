@@ -2,11 +2,12 @@ part of '../../HDM.dart';
 
 @protected
 class _StatsInitial extends StatelessWidget {
+  const _StatsInitial();
   @override
-  final Key key = Key("Temp Animation");
+  final Key key = const Key("Temp Animation");
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: CircularProgressIndicator(),
       ),

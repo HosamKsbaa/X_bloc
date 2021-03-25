@@ -4,6 +4,10 @@ part of '../../HDM.dart';
 class HDMKey<Handler> {
   const HDMKey();
   _StorageHolder<Handler> keyBuild(Widget function(HDMBox<Handler> box)) {
-    return _StorageHolder<Handler>(this, function);
+    return _StorageHolder<Handler>(
+      this,
+      function,
+      HDMBox<Handler>(),
+    );
   }
 }

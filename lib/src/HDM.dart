@@ -8,13 +8,12 @@ part 'Helpers/Key/Key.dart';
 part 'Helpers/Key/Storage.dart';
 part 'Helpers/Key/keyControler.dart';
 part 'Helpers/Other/WidgetStats.dart';
-part 'Helpers/Other/mixin.dart';
 part 'Helpers/Provider/Providerlib.dart';
 part 'Helpers/Provider/moduel.dart';
 
 //endregion
 
-class HDMMain<Handler extends HDMMix<Handler>> {
+class HDMMain<Handler> {
   //region  The Constructor
   final Handler _handler;
   final Widget Function(HDMBox<Handler>) _statsHere;
@@ -23,7 +22,7 @@ class HDMMain<Handler extends HDMMix<Handler>> {
   Widget Function(HDMBox<Handler>) _initial;
   //region  Constructor fun
   HDMMain(this._handler, this._statsHere, this._keysList, [this._wait, Widget initial2]) {
-    initial2 == null ? _initial = (box) => _StatsInitial() : _initial = _initial;
+    initial2 == null ? _initial = (box) => const _StatsInitial() : _initial = _initial;
     _assignTable();
   }
 
@@ -62,7 +61,7 @@ class HDMMain<Handler extends HDMMix<Handler>> {
       await _wait();
       _didNotInitialized = false;
 
-      update();
+      updateTheWholeApp();
     }
 
     if (_didNotInitialized) {
@@ -73,8 +72,8 @@ class HDMMain<Handler extends HDMMix<Handler>> {
         waitForIT();
 
         return HDM(
-            app: _handler,
-            keyBuilder: _fullAppKey.keyBuild((box) {
+            app: this,
+            child: _fullAppKey.keyBuild((box) {
               if (_didNotInitialized) {
                 //print("case 1");
                 return _initial(box);
@@ -86,23 +85,21 @@ class HDMMain<Handler extends HDMMix<Handler>> {
       }
       _didNotInitialized = false;
     }
-    return HDM(app: _handler, keyBuilder: _fullAppKey.keyBuild((box) => _statsHere(box)));
+    return HDM(app: this, child: _fullAppKey.keyBuild((box) => _statsHere(box)));
   }
 
   Widget playWIthProvider() {
-    return HDMProvider(play(), [HDMProvide<Handler>(_handler)]);
+    return HDMProvider(play(), [HDMProvide<Handler>(hdmMainObj: this)]);
   }
 
-  void update([HDMKey<Handler> hdmKey]) {
-    if (hdmKey != null) {
-      assert(_tableOfSetStateFuncList.containsKey(hdmKey), "this key dons't excist , you probably didin't add it to the list _keyList in  $Handler");
+  void update(HDMKey<Handler> hdmKey) {
+    // assert(_tableOfSetStateFuncList.containsKey(hdmKey), "this key dons't excist , you probably didin't add it to the list _keyList in  $Handler");
 
-      _tableOfSetStateFuncList[hdmKey].triggerAllSetStateFunctions();
-    } else {
-      //print("_fullAppKey");
-      _tableOfSetStateFuncList[_fullAppKey].triggerAllSetStateFunctions();
-    }
+    _tableOfSetStateFuncList[hdmKey].triggerAllSetStateFunctions();
   }
 
+  void updateTheWholeApp() {
+    _tableOfSetStateFuncList[_fullAppKey].triggerAllSetStateFunctions();
+  }
   //endregion
 }
