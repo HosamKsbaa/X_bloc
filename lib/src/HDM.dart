@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 part 'Helpers/Builder/Box.dart';
-part 'Helpers/Builder/Moduel.dart';
+part 'Helpers/Builder/HDMbuilder.dart';
 part 'Helpers/Key/Key.dart';
 part 'Helpers/Key/Storage.dart';
 part 'Helpers/Key/keyControler.dart';
@@ -34,6 +34,17 @@ class HDMMain<Handler> {
   final HDMKey<Handler> _fullAppKey = HDMKey<Handler>();
   final Map<HDMKey<Handler>, _HDMKeyController<Handler>> _tableOfSetStateFuncList = {};
 
+  //region inite dispose
+
+  void addToinit(Function f) => _initList.add(f);
+  void addToDispose(Function f) => _disposeList.add(f);
+  List<Function> _initList = [];
+  List<Function> _disposeList = [];
+  void _inite() => _initList.forEach((e) => e());
+  void _dispose() => _disposeList.forEach((e) => e());
+
+  //endregion
+
   ///Creat and Object for eachKey That the class have
   void _assignTable() {
     assert(_keysList.isNotEmpty, "No keys , witout key");
@@ -53,6 +64,7 @@ class HDMMain<Handler> {
   }
 
   //endregion
+
   //region    Handler Api
   bool _didNotInitialized = true;
 
@@ -72,16 +84,18 @@ class HDMMain<Handler> {
         waitForIT();
 
         return HDM(
-            app: this,
-            child: _fullAppKey.keyBuild((box) {
-              if (_didNotInitialized) {
-                //print("case 1");
-                return _initial!(box);
-              } else {
-                //print("case 3");
-                return _statsHere(box);
-              }
-            }));
+          app: this,
+          child: _fullAppKey.keyBuild((box) {
+            if (_didNotInitialized) {
+              //print("case 1");
+              return _initial!(box);
+            } else {
+              //print("case 3");
+              return _statsHere(box);
+            }
+          }),
+          isItPlayHDM: true,
+        );
       }
       _didNotInitialized = false;
     }
@@ -89,9 +103,11 @@ class HDMMain<Handler> {
   }
 
   Widget playWIthProvider() {
-    return HDMProvider(play(), [HDMProvide<Handler>(hdmMainObj: this)]);
+    return HDMProvider(play(), [HDMProvide<Handler>(_handler, this)]);
   }
 
+  void playError() {}
+  void playWating() {}
   void update(HDMKey<Handler> hdmKey) {
     // assert(_tableOfSetStateFuncList.containsKey(hdmKey), "this key dons't excist , you probably didin't add it to the list _keyList in  $Handler");
 
@@ -102,4 +118,15 @@ class HDMMain<Handler> {
     _tableOfSetStateFuncList[_fullAppKey]!.triggerAllSetStateFunctions();
   }
   //endregion
+}
+
+abstract class HDMStatelessWidget<Handler> extends StatelessWidget {
+  final Handler app;
+  final HDMBox<Handler> box;
+
+  HDMStatelessWidget(
+    this.app,
+    this.box, {
+    Key? key,
+  }) : super(key: key);
 }

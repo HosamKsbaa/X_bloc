@@ -10,7 +10,8 @@ class HDM extends StatefulWidget {
 
   final _StorageHolder child;
   final HDMMain? app;
-  const HDM({required this.child, this.app});
+  final bool isItPlayHDM;
+  const HDM({required this.child, this.app, this.isItPlayHDM = false});
   @override
   _HDMState createState() => _HDMState(this.app, this.child);
 }
@@ -24,16 +25,23 @@ class _HDMState extends State<HDM> {
   @override
   void didChangeDependencies() {
     // print("didChangeDependencies");
+
     child.box.context = context;
+
+    print("init");
+    if (widget.isItPlayHDM) app!._inite();
+
     _checkIfItIsTheFirstTime();
     child._addSetStateFunctionToTable(setState);
-
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     widget.child._removeSetStateFunctionToTable(setState);
+    print("dis");
+    if (widget.isItPlayHDM) app!._dispose();
+
     super.dispose();
   }
 
