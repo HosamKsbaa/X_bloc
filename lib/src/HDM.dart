@@ -20,6 +20,7 @@ class HDMMain<Handler> {
   final Function? _wait;
   final List<HDMKey<Handler>> _keysList;
   Widget Function(HDMBox<Handler>)? _initial;
+
   //region  Constructor fun
   HDMMain(this._handler, this._statsHere, this._keysList, [this._wait, Widget? initial2]) {
     initial2 == null ? _initial = (box) => const _StatsInitial() : _initial = _initial;
@@ -124,7 +125,7 @@ abstract class HDMStatelessWidget<Handler> extends StatelessWidget {
   final Handler app;
   final HDMBox<Handler> box;
 
-  HDMStatelessWidget(
+  const HDMStatelessWidget(
     this.app,
     this.box, {
     Key? key,
