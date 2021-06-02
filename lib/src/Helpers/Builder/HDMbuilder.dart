@@ -28,7 +28,7 @@ class _HDMState extends State<HDM> {
 
     child.box.context = context;
 
-    print("init");
+    // print("init");
     if (widget.isItPlayHDM) app!._inite();
 
     _checkIfItIsTheFirstTime();
@@ -39,7 +39,7 @@ class _HDMState extends State<HDM> {
   @override
   void dispose() {
     widget.child._removeSetStateFunctionToTable(setState);
-    print("dis");
+    //print("dis");
     if (widget.isItPlayHDM) app!._dispose();
 
     super.dispose();

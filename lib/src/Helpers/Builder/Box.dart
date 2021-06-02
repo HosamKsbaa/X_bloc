@@ -16,6 +16,7 @@ class HDMBox<Handler> {
     var temp = context.dependOnInheritedWidgetOfExactType<_HDMProviderObj<Handler>>();
     if (temp != null) {
       app = temp.hdmMainObj._handler;
+      this.hdmMainObj = temp.hdmMainObj;
     } else {
       throw ArgumentError('the class  $Handler in not in the widget tree');
     }
