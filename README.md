@@ -1,4 +1,3 @@
-Certainly! Here's a guide on how to use the provided Dart code in a README format. This guide focuses on explaining the structure and purpose of each component within the system, along with basic usage examples to help you integrate and utilize this system in your Flutter application.
 
 # HDM State Management System for Flutter
 
