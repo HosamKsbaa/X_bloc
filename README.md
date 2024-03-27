@@ -2,7 +2,64 @@
 # HDM State Management System for Flutter
 
 The HDM State Management System is a custom-built solution for managing state, widget lifecycle, and dependency injection in Flutter applications. It's designed to offer flexibility, efficient state management, and easy integration with the Flutter widget tree.
+```mermaid
 
+
+classDiagram
+    class HDM {
+        +HDMMain? app
+        +_StorageHolder child
+    }
+    class HDMBox~Handler~ {
+        -BuildContext context
+        -Handler? app
+        -HDMMain~Handler?~ hdmMainObj
+        -Map~int, Widget~ _widgetList
+        +_CashKey~Handler~ key(int x)
+        +_getAppWithProvider(_HDMProviderObj~Handler~ temp)
+        +_getAppWithNoProvider(HDMMain hdmMainObj)
+        +Widget? _cash(Widget Function() x, int key)
+    }
+    class HDMKey~Handler~ {
+        +_StorageHolder~Handler~ keyBuild(Widget function(HDMBox~Handler~ box))
+    }
+    class _CashKey~Handler~ {
+        -HDMBox~Handler~ _box
+        -int key
+        +Widget? cash(Widget Function() x)
+    }
+    class _StorageHolder~Handler~ {
+        -HDMKey~Handler~ key
+        -Widget Function(HDMBox~Handler~) widgetBuilder
+        -HDMBox~Handler~ box
+        +getAppWithProvider()
+        +getAppWithNoProvider(HDMMain hdmMainObj)
+    }
+    class HDMProvide~Handler~ {
+        -Handler? state
+        -HDMMain~Handler~? hdmMainObj
+        +_HDMProviderObj hDMProviderObjCreator(Widget child)
+    }
+    class _HDMProviderObj~Handler~ {
+        -Handler? state
+        -HDMMain~Handler~? hdmMainObj
+    }
+    class HDMProvider {
+        -Widget passedChild
+        -List~HDMProvide~ providers
+    }
+
+    HDM --> _StorageHolder : contains
+    _StorageHolder --> HDMBox : uses
+    HDMKey --> _StorageHolder : creates
+    HDMBox --> _CashKey : creates
+    _CashKey --> HDMBox : references
+    HDMBox --> HDMMain : references optionally
+    HDMProvide --> _HDMProviderObj : creates
+    HDMProvider --> HDMProvide : aggregates
+    _HDMProviderObj --> HDMMain : references optionally
+
+```
 ## System Overview
 
 The system comprises several key components, each serving a specific role in managing state and widgets:
